@@ -14,7 +14,7 @@ image:
 results:
   save_dir: "./Results"
 
-device : cpu
+device : tpu
 
 extantion:
   cpu : .h5

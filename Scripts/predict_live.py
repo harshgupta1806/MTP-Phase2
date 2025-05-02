@@ -1,271 +1,13 @@
-# import struct
-# import time
-# import cv2
-# import numpy as np
-# from typing import Dict
-# from Data_Collection.SynexensPythonSDK import *
-# from collections import deque
-# import numpy as np
-# import cv2
-# from tensorflow.keras.models import load_model
-# import time
-# from utils import load_configs
-
-# configs = load_configs('./config/lidar.yaml')
-
-# streamtype = configs['streamtype']  # SYStreamTypeEnum.SYSTREAMTYPE_DEPTH
-# resolution = configs['resolution']  # SYResolutionEnum.SYRESOLUTION_640_480
-# model_path = configs['model_path']
-
-# g_mapStreamType: Dict[int, SYStreamTypeEnum] = {}
-# g_mapSavePCL: Dict[int, bool] = {}
-# g_mapSaveDepthOrRaw: Dict[int, bool] = {}
-
-
-
-# # === Load Trained Model ===
-# model = load_model(model_path)
-
-# SEQUENCE_LENGTH = 10
-# IMG_SIZE = (92, 92)
-# CLASS_LABELS = ["lying", "sitting", "standing", "walking"]  # Update based on your training
-# frame_buffer = deque(maxlen=SEQUENCE_LENGTH)
-
-
-# image_counter = 0
-
-
-# def CreateOpencvWindow(nDeviceID: int, streamType: SYStreamTypeEnum, bDestoryOld: bool = False) -> None:
-#     name: str = ""
-#     if streamType == SYStreamTypeEnum.SYSTREAMTYPE_NULL:
-#         pass
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_RAW:
-#         if bDestoryOld:
-#             name = "RGBD_depth_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#             name = "RGBD_RGB_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "raw_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_DEPTH:
-#         if bDestoryOld:
-#             name = "raw_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "depth_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_RGB:
-#         if bDestoryOld:
-#             name = "depth_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "RGB_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_DEPTHIR:
-#         if bDestoryOld:
-#             name = "RGB_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "depth_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#         name = "ir_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_DEPTHRGB:
-#         if bDestoryOld:
-#             name = "ir_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "depth_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#         name = "RGB_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_DEPTHIRRGB:
-#         name = "depth_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#         name = "ir_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#         name = "RGB_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#     elif streamType == SYStreamTypeEnum.SYSTREAMTYPE_RGBD:
-#         if bDestoryOld:
-#             name = "depth_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#             name = "ir_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#             name = "RGB_{}".format(nDeviceID)
-#             cv2.destroyWindow(name)
-#         name = "RGBD_depth_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-#         name = "RGBD_RGB_{}".format(nDeviceID)
-#         cv2.namedWindow(name, cv2.WINDOW_NORMAL)
-
-
-# def ProcessFrameData(nDeviceID, pFrameData: POINTER(SYFrameData)):
-#     if g_mapStreamType.get(nDeviceID) is not None:
-#         print("**DeviceID ={} StreamType={}".format(nDeviceID, g_mapStreamType[nDeviceID]))
-#         if streamType == SYStreamTypeEnum.SYSTREAMTYPE_RGBD:
-#             objFrameData = pFrameData.contents
-#             mapIndex: Dict[SYFrameTypeEnum, int] = {}
-#             mapPos: Dict[SYFrameTypeEnum, int] = {}
-#             nPos: int = 0
-#             for nFrameIndex in range(objFrameData.m_nFrameCount):
-#                 mapIndex[objFrameData.m_pFrameInfo[nFrameIndex].m_frameType] = nFrameIndex
-#                 mapPos[objFrameData.m_pFrameInfo[nFrameIndex].m_frameType] = nPos
-#                 nPos += objFrameData.m_pFrameInfo[nFrameIndex].m_nFrameHeight * objFrameData.m_pFrameInfo[nFrameIndex].m_nFrameWidth * sizeof(c_short)
-#             itDepthIndex = mapIndex.get(SYFrameTypeEnum.SYFRAMETYPE_DEPTH)
-#             itRGBIndex = mapIndex.get(SYFrameTypeEnum.SYFRAMETYPE_RGB)
-#             nRGBDWidth = objFrameData.m_pFrameInfo[itRGBIndex].m_nFrameWidth
-#             nRGBDHeight = objFrameData.m_pFrameInfo[itRGBIndex].m_nFrameHeight
-#             pRGBDDepth = (c_ushort * (nRGBDWidth * nRGBDHeight))()
-#             pRGBDRGB = (c_ubyte * (nRGBDWidth * nRGBDHeight * 3))()
-#             if itDepthIndex is not None and itRGBIndex is not None:
-#                 data_pointer_depth = cast(objFrameData.m_pData + mapPos[SYFrameTypeEnum.SYFRAMETYPE_DEPTH], POINTER(c_ushort))
-#                 data_pointer_rgb = cast(objFrameData.m_pData + mapPos[SYFrameTypeEnum.SYFRAMETYPE_RGB], POINTER(c_ubyte))
-#                 errorCodeGetRGBD = GetRGBD(nDeviceID,
-#                                            objFrameData.m_pFrameInfo[itDepthIndex].m_nFrameWidth,
-#                                            objFrameData.m_pFrameInfo[itDepthIndex].m_nFrameHeight, data_pointer_depth,
-#                                            objFrameData.m_pFrameInfo[itRGBIndex].m_nFrameWidth,
-#                                            objFrameData.m_pFrameInfo[itRGBIndex].m_nFrameHeight, data_pointer_rgb,
-#                                            nRGBDWidth, nRGBDHeight, pRGBDDepth, pRGBDRGB)
-#                 if errorCodeGetRGBD == SYErrorCode.SYERRORCODE_SUCCESS:
-#                     # Depth
-#                     nCount = nRGBDHeight * nRGBDWidth
-
-#                     ArrayType = c_ubyte * (nCount * 3)
-#                     pColor = ArrayType()
-
-#                     rgbd_depth_bgr = np.zeros((nRGBDHeight, nRGBDWidth, 3), dtype=np.uint8)
-
-#                     gray16 = np.zeros((nRGBDHeight, nRGBDWidth), dtype=np.uint16)
-#                     memmove(gray16.ctypes.data, pRGBDDepth, nCount * 2)
-
-#                     if GetDepthColor(nDeviceID, nCount, pRGBDDepth, pColor) == SYErrorCode.SYERRORCODE_SUCCESS:
-#                         memmove(rgbd_depth_bgr.ctypes.data, pColor, nRGBDHeight * nRGBDWidth * 3)
-#                         rgbd_depth_rgb = cv2.cvtColor(rgbd_depth_bgr, cv2.COLOR_BGR2RGB)
-#                         cv2.imshow("RGBD_depth_{}".format(nDeviceID), rgbd_depth_rgb)
-#                     else:
-#                         tmp = cv2.normalize(gray16, None, 0, 255, cv2.NORM_MINMAX)
-#                         gray8 = cv2.convertScaleAbs(tmp)
-#                         rgbimg = cv2.cvtColor(gray8, cv2.COLOR_GRAY2RGB)
-#                         cv2.imshow("RGBD_depth_{}".format(nDeviceID), rgbimg)
-#                     del pColor
-
-#                     # RGB
-#                     rgbd_bgr = np.zeros((nRGBDHeight, nRGBDWidth, 3), dtype=np.uint8)
-#                     memmove(rgbd_bgr.ctypes.data, pRGBDRGB, nRGBDHeight * nRGBDWidth * 3)
-#                     rgbd_rgb = cv2.cvtColor(rgbd_bgr, cv2.COLOR_BGR2RGB)
-#                     cv2.imshow("RGBD_RGB_{}".format(nDeviceID), rgbd_rgb)
-#                 else:
-#                     PrintErrorCode("GetRGBD", errorCodeGetRGBD)
-
-#                 del pRGBDDepth
-#                 del pRGBDRGB
-#         else:
-#             objFrameData = pFrameData.contents
-#             nPos: int = 0
-#             for i in range(objFrameData.m_nFrameCount):
-#                 nFrameHeight = objFrameData.m_pFrameInfo[i].m_nFrameHeight
-#                 nFrameWidth = objFrameData.m_pFrameInfo[i].m_nFrameWidth
-#                 # 计算深度图像的像素点个数
-#                 nCount = nFrameHeight * nFrameWidth
-#                 if objFrameData.m_pFrameInfo[i].m_frameType == SYFrameTypeEnum.SYFRAMETYPE_RAW:
-#                     pRaw = (c_ushort * nCount)()
-#                     ptr_void_new = c_void_p(objFrameData.m_pData + nPos)
-#                     ptr_new = cast(ptr_void_new, POINTER(c_ushort))
-#                     memmove(pRaw, ptr_new, sizeof(c_ushort) * nCount)
-#                     gray16 = np.frombuffer(pRaw, dtype=np.uint16).reshape(nFrameHeight, nFrameWidth)
-#                     gray8 = cv2.normalize(gray16, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
-
-#                     cv2.imshow("raw_{}".format(nDeviceID), gray8)
-#                     # 保存Raw图
-#                     if g_mapSaveDepthOrRaw.get(nDeviceID) is not None and g_mapSaveDepthOrRaw[nDeviceID]:
-#                         pre = f"{nDeviceID}_{objFrameData.m_pFrameInfo[i].m_nFrameWidth}x{objFrameData.m_pFrameInfo[i].m_nFrameHeight}-{int(time.time())}"
-#                         depth_name = f"{pre}.raw"
-
-#                         with open(depth_name, "wb") as fp:
-#                             fp.write(objFrameData.m_pData[nPos:].tobytes())
-
-#                         g_mapSaveDepthOrRaw[nDeviceID] = False
-#                     nPos += nCount * sizeof(c_short)
-#                 elif objFrameData.m_pFrameInfo[i].m_frameType == SYFrameTypeEnum.SYFRAMETYPE_DEPTH:
-#                     # print("I am here")
-#                     global image_counter
-#                     pDepth = (c_ushort * nCount)()
-#                     ptr_void_new = c_void_p(objFrameData.m_pData + nPos)
-#                     ptr_new = cast(ptr_void_new, POINTER(c_ushort))
-#                     memmove(pDepth, ptr_new, sizeof(c_ushort) * nCount)
-#                     ArrayType = c_ubyte * (nCount * 3)
-#                     pColor = ArrayType()
-#                     depthimg = np.zeros((nFrameHeight, nFrameWidth, 3), dtype=np.uint8)
-#                     if GetDepthColor(c_uint(nDeviceID), nCount, pDepth, pColor) == SYErrorCode.SYERRORCODE_SUCCESS:
-#                         memmove(depthimg.ctypes.data, pColor,objFrameData.m_pFrameInfo[i].m_nFrameHeight * objFrameData.m_pFrameInfo[i].m_nFrameWidth * 3)
-#                         gray = cv2.cvtColor(depthimg, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
-#                         resized = cv2.resize(gray, IMG_SIZE)  # Resize to (92, 92)
-#                         normalized = resized / 255.0  # Normalize to [0, 1]
-#                         frame_buffer.append(normalized)  # Shape: (92, 92)
-
-#                         display_frame = cv2.cvtColor(resized, cv2.COLOR_GRAY2BGR)  # For visualization
-
-#                         # Run prediction if enough frames
-#                         if len(frame_buffer) == SEQUENCE_LENGTH:
-#                             input_seq = np.stack(frame_buffer, axis=-1)  # Shape: (92, 92, 10)
-#                             input_seq = np.expand_dims(input_seq, axis=0)  # Add batch dimension -> (1, 92, 92, 10)
-                            
-#                             prediction = model.predict(input_seq, verbose=0)
-#                             predicted_class = CLASS_LABELS[np.argmax(prediction)]
-#                             confidence = np.max(prediction)
-
-#                             # Draw prediction on the frame
-#                             text = f"Activity: {predicted_class} ({confidence*100:.1f}%)"
-#                             cv2.putText(display_frame, text, (10, 20),
-#                                         cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 255, 0), 1)
-#                         else:
-#                             # Show buffering status
-#                             text = f"Buffering: {len(frame_buffer)}/{SEQUENCE_LENGTH}"
-#                             cv2.putText(display_frame, text, (10, 20),
-#                                         cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 0, 255), 1)
-
-#         # Show final frame
-#                         window_name = f"depth_{nDeviceID}"
-#                         cv2.imshow(window_name, cv2.cvtColor(display_frame, cv2.COLOR_RGB2BGR))
-
-#                     else:
-#                         gray16 = np.zeros((nFrameHeight, nFrameWidth), dtype=np.uint16)
-#                         memmove(gray16.ctypes.data, pDepth, nCount * 2)
-#                         tmp = cv2.normalize(gray16, None, 0, 255, cv2.NORM_MINMAX)
-#                         gray8 = cv2.convertScaleAbs(tmp)
-#                         rgbimg = cv2.cvtColor(gray8, cv2.COLOR_GRAY2RGB)
-#                         cv2.imshow("depth_{}".format(nDeviceID), rgbimg)
-#                     del pColor
-#                     nPos += nCount * sizeof(c_short)
-#                 elif objFrameData.m_pFrameInfo[i].m_frameType == SYFrameTypeEnum.SYFRAMETYPE_IR:
-#                     pIR = (c_ushort * nCount)()
-#                     ptr_void_new = c_void_p(objFrameData.m_pData + nPos)
-#                     ptr_new = cast(ptr_void_new, POINTER(c_ushort))
-#                     memmove(pIR, ptr_new, sizeof(c_ushort) * nCount)
-#                     gray16 = np.frombuffer(pIR, dtype=np.uint16).reshape(nFrameHeight, nFrameWidth)
-
-#                     gray8 = np.zeros((nFrameHeight, nFrameWidth), dtype=np.uint8)
-#                     cv2.convertScaleAbs(gray16, gray8, 0.5, 0)
-
-#                     cv2.imshow("ir_{}".format(nDeviceID), gray8)
-#                     nPos += nCount * sizeof(c_short)
-
-#                 elif objFrameData.m_pFrameInfo[i].m_frameType == SYFrameTypeEnum.SYFRAMETYPE_RGB:
-#                     data_pointer = cast(objFrameData.m_pData + nPos, POINTER(c_ubyte))
-#                     data_array = np.ctypeslib.as_array(data_pointer, shape=(nFrameHeight * nFrameWidth * 2,))
-#                     img_yuyv_cvt = data_array.reshape(nFrameHeight, nFrameWidth, 2)
-#                     yuyv_array = np.frombuffer(img_yuyv_cvt, dtype=np.uint8)
-#                     yuyv_image = yuyv_array.reshape((nFrameHeight, nFrameWidth, 2))
-#                     rgb_image = cv2.cvtColor(yuyv_image, cv2.COLOR_YUV2BGR_YUYV)
-#                     cv2.imshow("RGB_{}".format(nDeviceID), rgb_image)
-#                     nPos += nCount * 3 / 2
 import struct
 import time
 import cv2
 import numpy as np
 from typing import Dict
-from Data_Collection.SynexensPythonSDK import *  # Import Synexens SDK for handling sensor data
+from Scripts.Data_Collection.SynexensPythonSDK import *  # Import Synexens SDK for handling sensor data
 from collections import deque
 from tensorflow.keras.models import load_model  # For loading the trained Keras model
 import time
-from utils import load_configs  # To load configuration files (like stream settings)
+from .utils import load_configs  # To load configuration files (like stream settings)
 
 # Load configuration settings from YAML file
 configs = load_configs('./config/lidar.yaml')
@@ -274,7 +16,7 @@ configs = load_configs('./config/lidar.yaml')
 streamtype = configs['streamtype']  # SYStreamTypeEnum.SYSTREAMTYPE_DEPTH
 resolution = configs['resolution']  # SYResolutionEnum.SYRESOLUTION_640_480
 model_path = configs['model_path']
-
+input_size = configs['input_size']
 # Dictionaries for managing stream types, save settings, etc.
 g_mapStreamType: Dict[int, SYStreamTypeEnum] = {}
 g_mapSavePCL: Dict[int, bool] = {}
@@ -285,7 +27,7 @@ model = load_model(model_path)
 
 # Sequence length for activity recognition (e.g., number of frames to consider for prediction)
 SEQUENCE_LENGTH = 10
-IMG_SIZE = (92, 92)  # Image size for input to the model
+IMG_SIZE = (input_size, input_size)  # Image size for input to the model
 CLASS_LABELS = ["lying", "sitting", "standing", "walking"]  # Possible activity classes
 frame_buffer = deque(maxlen=SEQUENCE_LENGTH)  # Buffer to store frames for activity prediction
 
@@ -479,6 +221,8 @@ def ProcessFrameData(nDeviceID, pFrameData: POINTER(SYFrameData)):
                             prediction = model.predict(input_seq, verbose=0)
                             predicted_class = CLASS_LABELS[np.argmax(prediction)]
                             confidence = np.max(prediction)
+                            if confidence < 0.6:
+                                predicted_class = "Unknown"
 
                             # Display prediction on the frame
                             text = f"Activity: {predicted_class} ({confidence*100:.1f}%)"

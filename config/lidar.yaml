@@ -6,4 +6,5 @@ resolution : SYResolutionEnum.SYRESOLUTION_640_480 # SYResolutionEnum.SYRESOLUTI
 save_pcd : True
 save_frame : True 
 is_live : False
-model_path : "./Models/lidar_model_1.h5"
+model_path : "./Models/final_lidar.h5"
+input_size : 224
