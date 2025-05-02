@@ -216,7 +216,8 @@ The `Scripts/` folder contains all the core Python scripts and notebooks used th
 |--------------------------------|-------------|
 | `collect_data.py`              | Collects depth and point cloud data using the LiDAR sensor and save it in specific folder. |
 | `train.py`                     | Trains a model on the collected depth data. and convert it in tflite format |
-| `evaluate.py`                  | Evaluates the trained model and outputs performance metrics in cmd and save results in csv file present in `/results` folder|
+| `evaluate.py`                  | Evaluates the trained model and outputs performance metrics in cmd and save results in csv file present in `/results` folder (For Inference on CPU / CPU + TPU)|
+| `evaluate_rpi.py`              | Evaluates the trained model and outputs performance metrics in cmd (For Inference on Rpi / Rpi + TPU) |   
 | `predict_live.py`              | Performs real-time inference using model specified in `./config/lidar.yaml` using live depth frames captured by lidar CS20 Camera. |
 | `model.py`                     | Contains the architecture definition. This defination of model is used when we train the model using `train.py`|
 | `imports.py`                   | Centralized common imports for the project. |
@@ -246,9 +247,14 @@ python -m Scripts.collect_data
 python -m Scripts.train
 ```
 
-#### 3. Evaluate the Model
+#### 3. Evaluate the Model on CPU/CPU + TPU
 ```bash
 python -m Scripts.evaluate
+```
+
+#### 3. Evaluate the Model on Respberry Pi /Respberry Pi + TPU
+```bash
+python -m Scripts.evaluate_rpi
 ```
 
 #### 4. Run Real-Time Inference 
@@ -263,6 +269,7 @@ python -m Scripts.predict_live.py
 ### Notes
 - Before Running any script make sure current dir is MTP-Phase2
 - Make sure your depth camera is connected before running data collection or live inference.
+- If inference is on Respberry Pi make sure to change model_path and test_dir as needed in `evaluate_rpi.py`
 - Modify YAML files in the `config/` directory to change paths, model parameters, or sensor settings.
 - Trained models are stored in the `Models/` directory.
 - Logs can be found in the `log/`.

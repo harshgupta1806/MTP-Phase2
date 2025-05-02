@@ -18,15 +18,15 @@ def is_edgetpu_available():
         return False
 
 
-def load_model():
+def load_model(model_path):
     if is_edgetpu_available():
         print("Using Edge TPU model.")
         return tflite.Interpreter(
-            model_path="/home/raghav/mtp/phase2/models/model_cropped_edgetpu.tflite",
+            model_path=model_path,
             experimental_delegates=[tflite.load_delegate("libedgetpu.so.1.0")])
     else:
         print("Using CPU model.")
-        return tf.lite.Interpreter(model_path="/home/raghav/mtp/phase2/models/model_cropped.tflite")
+        return tf.lite.Interpreter(model_path=model_path)
 
 def load_sequence_as_input(image_paths, target_size=(224, 224), expected_channels=10):
     """
@@ -117,7 +117,8 @@ def run_inference(test_root_path, interpreter, image_shape=(224, 224), sequence_
 
 
 if __name__ == "__main__":
-    test_data_path = "/home/raghav/mtp/phase2/test"  # Change as needed
-    interpreter = load_model()
+    model_path = "./Models/model_cropped_edgetpu.tflite"  # Change as needed
+    test_data_path = "./data/Data/test"  # Change as needed
+    interpreter = load_model(model_path)
     interpreter.allocate_tensors()
     run_inference(test_data_path, interpreter)
