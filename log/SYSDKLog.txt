@@ -1,0 +1,33 @@
+/***********************************
+App start up.
+************************************/
+2025-05-02 17:41:37 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:188:FindDevice In
+2025-05-02 17:41:37 ERROR 13888  D:\code\SYSDK4\SynexensSDK\src\communicate\UVC\SYCommunicateManagerImplUVC.cpp:78:uvc_find_device error:-4
+2025-05-02 17:41:37 DEBUG 13888  D:\code\SYSDK4\SynexensSDK\src\communicate\TCP\SYCommunicateManagerImplTCP.cpp:255:UDP Find local IP:192.168.0.178
+2025-05-02 17:41:38 DEBUG 13888  D:\code\SYSDK4\SynexensSDK\src\communicate\TCP\SYCommunicateManagerImplTCP.cpp:255:UDP Find local IP:172.17.176.1
+2025-05-02 17:41:38 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:221:FindDevice Out result: 0
+2025-05-02 17:41:38 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:188:FindDevice In
+2025-05-02 17:41:38 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:221:FindDevice Out result: 0
+2025-05-02 17:41:38 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:227:OpenDevice In, DeviceID:1 ,DeviceType:3
+2025-05-02 17:41:39 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:294:OpenDevice Out result: 0
+2025-05-02 17:41:39 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1142:GetDeviceSN In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1160:GetDeviceSN Out result: 0
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1142:GetDeviceSN In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1160:GetDeviceSN Out result: 0
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1190:GetDeviceHWVersion In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1208:GetDeviceHWVersion Out result: 0
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1190:GetDeviceHWVersion In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:1208:GetDeviceHWVersion Out result: 0
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:332:QueryDeviceSupportFrameType In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:332:QueryDeviceSupportFrameType In, DeviceID:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:362:QueryDeviceSupportFrameType Out result: 0FrameType:1.
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:375:QueryDeviceSupportResolution In, DeviceID:1 ,supportType:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:375:QueryDeviceSupportResolution In, DeviceID:1 ,supportType:1
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:405:QueryDeviceSupportResolution Out result: 0Resolution:1.2.
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:515:SetFrameResolution In, DeviceID:1 ,frameType:2 ,resolution:2
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:533:SetFrameResolution Out result: 0
+2025-05-02 17:41:40 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:443:StartStreaming In, DeviceID:1 ,streamType:2
+2025-05-02 17:41:45 INFO  13888  D:\code\SYSDK4\SynexensSDK\src\device\SYDeviceManager.cpp:461:StartStreaming Out result: 0
+/***********************************
+App clean up.
+************************************/

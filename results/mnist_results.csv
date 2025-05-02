@@ -1,0 +1,6 @@
+Model_Name,Input_Size,Total_Parameters,Total_Time(s),Avg_Time_per_Image(ms),Accuracy(%),FPS,Device
+test_mnist,28,131562,0.1383,0.01,96.56,tflite
+test_mnist,28,131562,0.1264,0.01,95.30,tflite
+test_mnist,28,131562,0.0722,0.01,95.30,tflite
+complex_mnist_model,28,8780042,7.1528,0.72,98.26,1398.05,tflite
+complex_mnist_model,28,8780042,7.1349,0.71,98.26,1401.56,tflite

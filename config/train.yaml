@@ -1,0 +1,17 @@
+dir:
+  train : "./data/Data/depth_image_cropped/train"
+  save_dir : "./Models"
+
+model:
+  name : "final_lidar"
+  epochs : 10
+  batch_size : 64
+  num_classes : 4
+  channels : 1
+
+image:
+  img_size : 224
+  frames_per_sample : 10
+  channels : 1
+
+

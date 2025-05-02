@@ -1,0 +1,5 @@
+name : final_lidar
+optimizer : adam
+loss : categorical_crossentropy
+metrics : ['accuracy']
+log : ./log/model.txt

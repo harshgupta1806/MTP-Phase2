@@ -1,0 +1,24 @@
+model:
+  model_name: "final_lidar"
+  model_dir: "./Models"
+
+data:
+  test_dir: "./data/Data/depth_image_cropped/test"
+  video_path: "./data/test_video.mp4"
+
+image:
+  img_size : 224 
+  frames_per_sample : 10
+  channels : 1
+
+results:
+  save_dir: "./Results"
+
+device : cpu
+
+extantion:
+  cpu : .h5
+  tflite : .tflite
+  tpu : _edgetpu.tflite
+
+num_classes : 4

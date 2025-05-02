@@ -1,0 +1,3 @@
+Total Samples,Correct,Accuracy (%),Avg Inference Time (s),Device
+406,405,99.75,0.0622,cpu
+406,405,99.75,0.0601,cpu

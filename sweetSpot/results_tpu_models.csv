@@ -1,0 +1,6 @@
+Model_Name,Model_Size(KB),Model_Size(MB),Total_Parameters,Total_Time(s),Avg_Time_per_Image(ms),Accuracy(%),Device
+model_1,240.81,0.24,804,8.9140,0.89,98.06,Edge TPU
+model_2,152.81,0.15,804,4.2536,0.43,98.96,Edge TPU
+model_3,1252.81,1.22,804,34.0726,3.41,99.03,Edge TPU
+model_4,5860.81,5.72,804,7.6381,0.76,11.35,Edge TPU
+model_5,5488.81,5.36,804,7.5520,0.76,99.19,Edge TPU

@@ -1,0 +1,6 @@
+Model_Name,Model_Size,Total_Parameters,Total_Time(s),Avg_Time_per_Image(ms),Accuracy(%),Device
+model_1,0.11,131562,0.1792,0.02,98.06,CPU
+model_2,0.05,84682,0.3870,0.04,98.96,CPU
+model_3,1.15,1278538,1.3406,0.13,99.03,CPU
+model_4,5.66,6078602,12.0004,1.20,11.35,CPU
+model_5,7.30,7789706,16.1484,1.61,99.19,CPU

@@ -1,0 +1,14 @@
+Edge TPU Compiler version 16.0.384591198
+Input: test_lidar.tflite
+Output: test_lidar_edgetpu.tflite
+
+Operator                       Count      Status
+
+FULLY_CONNECTED                2          Mapped to Edge TPU
+RESHAPE                        1          Mapped to Edge TPU
+MAX_POOL_2D                    2          Mapped to Edge TPU
+SOFTMAX                        1          Mapped to Edge TPU
+AVERAGE_POOL_2D                1          Mapped to Edge TPU
+DEQUANTIZE                     1          Operation is working on an unsupported data type
+QUANTIZE                       1          Mapped to Edge TPU
+CONV_2D                        2          Mapped to Edge TPU

@@ -1,0 +1,9 @@
+frame_dir : ./collected_data/frames
+pcd_dir : ./collected_data/pcd
+init_frame_number : 0
+streamtype : SYStreamTypeEnum.SYSTREAMTYPE_DEPTH  # SYStreamTypeEnum.SYSTREAMTYPE_DEPTH
+resolution : SYResolutionEnum.SYRESOLUTION_640_480 # SYResolutionEnum.SYRESOLUTION_640_480
+save_pcd : True
+save_frame : True 
+is_live : False
+model_path : "./Models/lidar_model_1.h5"
