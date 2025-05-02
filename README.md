@@ -34,8 +34,8 @@ cd MTP-Phase2
 Using `venv`:
 
 ```bash
-python3 -m venv qat-env
-qat-env\Scripts\activate  # On Linux: source qat-env\Scripts\activate
+python3 -m venv mtp-env
+mtp-env\Scripts\activate  # On Linux: source mtp-env\Scripts\activate
 ```
 ---
 
@@ -116,7 +116,6 @@ MTP-Phase2/
 ├── log/                            # Output logs
 │   ├── mnist.txt
 │   ├── model.txt
-│   ├── requirements.txt
 │   └── SYSDKLog.txt
 │
 ├── Models/                         # All trained models (.h5, .tflite, EdgeTPU versions)
@@ -231,10 +230,10 @@ Before running, Ensure base dir is `MTP-Phase2` and then activate the virtual en
 
 ```bash
 # Windows
-.\qat-env\Scripts\activate
+.\mtp-env\Scripts\activate
 
 # Linux/Mac
-source qat-env/bin/activate
+source mtp-env/bin/activate
 ```
 
 #### 1. Collect Data
@@ -263,7 +262,11 @@ python -m Scripts.evaluate_rpi
 ```bash
 python -m Scripts.predict_live.py
 ```
+#### 5. Inference on Video Data
 
+```bash
+python -m Scripts.evaluate_video.py
+```
 ---
 
 ### Notes
