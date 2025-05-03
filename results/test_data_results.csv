@@ -32,3 +32,4 @@ Total Samples,Correct,Accuracy (%),Total Time (s),Avg Inference Time (s),FPS,Dev
 406,202,49.75,88.2432,0.2173,4.6,cpu
 764,638,83.51,135.7839,0.1777,5.63,cpu
 764,689,90.18,1.9536,0.0026,391.07,tpu
+764,638,83.51,55.7232,0.0729,13.71,cpu

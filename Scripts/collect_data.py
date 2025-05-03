@@ -206,9 +206,8 @@ def ProcessFrameData(nDeviceID, pFrameData: POINTER(SYFrameData)):
                     memmove(pDepth, ptr_new, sizeof(c_ushort) * nCount)
                     ArrayType = c_ubyte * (nCount * 3)
                     pColor = ArrayType()
-
-                    # Convert depth data to color for display
                     depthimg = np.zeros((nFrameHeight, nFrameWidth, 3), dtype=np.uint8)
+
                     if GetDepthColor(c_uint(nDeviceID), nCount, pDepth, pColor) == SYErrorCode.SYERRORCODE_SUCCESS:
                         memmove(depthimg.ctypes.data, pColor, objFrameData.m_pFrameInfo[i].m_nFrameHeight * objFrameData.m_pFrameInfo[i].m_nFrameWidth * 3)
                         img = cv2.cvtColor(depthimg, cv2.COLOR_BGR2RGB)
@@ -223,27 +222,36 @@ def ProcessFrameData(nDeviceID, pFrameData: POINTER(SYFrameData)):
                         itSavePCL = g_mapSavePCL.get(nDeviceID)
                         if itSavePCL is not None:
                             if itSavePCL:
-                                # Save point cloud data if needed
-                                LP_SYPointCloudData = POINTER(SYPointCloudData)
-                                data_array = (SYPointCloudData * nCount)()
-                                pPCLData = cast(data_array, LP_SYPointCloudData)
-                                if GetDepthPointCloud(nDeviceID, nFrameWidth, nFrameHeight, pDepth, pPCLData) == SYErrorCode.SYERRORCODE_SUCCESS:
-                                    if save_pcd:
-                                        filename = str(image_counter) + "_PointCloudData" + ".pcd"
-                                        strFileName = str(pcd_dir)
-                                        with open(os.path.join(strFileName, filename), "w") as fp:
+                                if save_pcd:
+                                    LP_SYPointCloudData = POINTER(SYPointCloudData)
+                                    data_array = (SYPointCloudData * nCount)()
+                                    pPCLData = cast(data_array, LP_SYPointCloudData)
+                                    if GetDepthPointCloud(nDeviceID, nFrameWidth, nFrameHeight, pDepth,pPCLData) == SYErrorCode.SYERRORCODE_SUCCESS:
+                                        filename = os.path.join(pcd_dir, f"depth_{nDeviceID}_{image_counter:04d}.pcd")
+                                        # 打开文件并写入.pcd文件头信息
+                                        with open(filename, "w") as fp:
                                             fp.write("# .PCD v0.7 - Point Cloud Data file format\n")
                                             fp.write("VERSION 0.7\n")
                                             fp.write("FIELDS x y z rgb\n")
                                             fp.write("SIZE 4 4 4 4\n")
                                             fp.write("TYPE F F F U\n")
-                                            fp.write(f"POINTS {len(pPCLData)}\n")
+                                            fp.write("COUNT 1 1 1 1\n")
+                                            fp.write(f"WIDTH  {nCount}\n")
+                                            fp.write("HEIGHT 1\n")
+                                            fp.write("VIEWPOINT 0 0 0 1 0 0 0\n")
+                                            fp.write(f"POINTS {nCount}\n")
                                             fp.write("DATA ascii\n")
-                                            for i in range(nCount):
-                                                fp.write(f"{pPCLData[i].x} {pPCLData[i].y} {pPCLData[i].z} {pPCLData[i].rgb}\n")
-
-                                            print(f"Saved: {filename}")
-                                del pPCLData
+                                    
+                                            for n in range(nCount):
+                                                cTempType = c_ubyte * 4
+                                                cTemp = cTempType()
+                                                cTemp[1] = c_ubyte(pColor[n * 3])
+                                                cTemp[2] = c_ubyte(pColor[n * 3 + 1])
+                                                cTemp[3] = c_ubyte(pColor[n * 3 + 2])
+                                                nTemp = struct.unpack('I', cTemp)[0]
+                                                fp.write(f"{pPCLData[n].m_fltX} {pPCLData[n].m_fltY} {pPCLData[n].m_fltZ} {nTemp}\n")
+                                    del pPCLData
+                            g_mapSavePCL[nDeviceID] = True
                         image_counter += 1
 
                     del pColor

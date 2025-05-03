@@ -8,3 +8,4 @@ save_frame : True
 is_live : False
 model_path : "./Models/final_lidar.h5"
 input_size : 224
+device : tpu

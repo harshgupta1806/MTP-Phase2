@@ -5,7 +5,8 @@ import time
 from tensorflow.keras.models import load_model
 from collections import defaultdict
 from .utils import load_configs  # To load configuration files (like stream settings)
-
+from Scripts.Data_Collection.SynexensPythonSDK import *
+from Scripts.Data_Collection.SYPythonDataDefine import *
 # Load configuration settings from YAML file
 configs = load_configs('./config/test.yaml')
 

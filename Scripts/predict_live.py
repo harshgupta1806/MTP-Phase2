@@ -15,15 +15,43 @@ configs = load_configs('./config/lidar.yaml')
 # Extract stream type, resolution, and model path from the config
 streamtype = configs['streamtype']  # SYStreamTypeEnum.SYSTREAMTYPE_DEPTH
 resolution = configs['resolution']  # SYResolutionEnum.SYRESOLUTION_640_480
-model_path = configs['model_path']
+MODEL_PATH = configs['model_path']
 input_size = configs['input_size']
+DEVICE = configs['device']  # Device type (cpu or tpu)
+
+CLASS_NAMES = ['lying', 'sitting', 'standing', 'walking']
+
 # Dictionaries for managing stream types, save settings, etc.
 g_mapStreamType: Dict[int, SYStreamTypeEnum] = {}
 g_mapSavePCL: Dict[int, bool] = {}
 g_mapSaveDepthOrRaw: Dict[int, bool] = {}
 
 # Load the trained model for activity recognition
-model = load_model(model_path)
+
+is_tpu = (DEVICE == "tpu")
+
+# Try importing EdgeTPU interpreter
+try:
+    from pycoral.utils.edgetpu import make_interpreter as coral_make_interpreter
+    from pycoral.adapters import common as coral_common
+    PY_CORAL_AVAILABLE = True
+except ImportError:
+    PY_CORAL_AVAILABLE = False
+
+# === Load model ===
+print(f"[INFO] Loading model for {'Edge TPU' if is_tpu else 'CPU'}...")
+if is_tpu and PY_CORAL_AVAILABLE:
+    MODEL_PATH = MODEL_PATH.replace('.h5', '_edgetpu.tflite')
+    interpreter = coral_make_interpreter(MODEL_PATH)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()[0]
+    output_details = interpreter.get_output_details()[0]
+    input_index = input_details['index']
+    output_index = output_details['index']
+else:
+    model = load_model(MODEL_PATH)
+
+
 
 # Sequence length for activity recognition (e.g., number of frames to consider for prediction)
 SEQUENCE_LENGTH = 10
@@ -215,17 +243,28 @@ def ProcessFrameData(nDeviceID, pFrameData: POINTER(SYFrameData)):
 
                         # Make prediction if enough frames are in the buffer
                         if len(frame_buffer) == SEQUENCE_LENGTH:
-                            input_seq = np.stack(frame_buffer, axis=-1)
-                            input_seq = np.expand_dims(input_seq, axis=0)  # Add batch dimension
+                            input_seq = np.stack(frame_buffer, axis=-1)  
+                            input_tensor = np.expand_dims(input_seq, axis=0).astype(np.uint8)# Add batch dimension
 
-                            prediction = model.predict(input_seq, verbose=0)
-                            predicted_class = CLASS_LABELS[np.argmax(prediction)]
-                            confidence = np.max(prediction)
-                            if confidence < 0.6:
+                            start = time.time()
+                            if is_tpu and PY_CORAL_AVAILABLE:
+                                interpreter.set_tensor(input_index, input_tensor)
+                                interpreter.invoke()
+                                output_data = interpreter.get_tensor(output_index)
+                                if 'quantization' in output_details and output_details['quantization'] != (0.0, 0):
+                                    scale, zero_point = output_details['quantization']
+                                    output_data = scale * (output_data.astype(np.float32) - zero_point)
+                                output_data = output_data.flatten()
+                            else:
+                                output_data = model.predict(input_tensor, verbose=0)[0]
+                            inference_time = time.time() - start
+                            confidence = np.max(output_data)  # Get the maximum confidence score
+                            predicted_class = CLASS_NAMES[np.argmax(output_data)]
+                            if confidence <= 0.5:
                                 predicted_class = "Unknown"
 
                             # Display prediction on the frame
-                            text = f"Activity: {predicted_class} ({confidence*100:.1f}%)"
+                            text = f"Activity: {predicted_class} ({confidence*100:.1f}%\n Time: {inference_time:.4f}s)"
                             cv2.putText(display_frame, text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 255, 0), 1)
                         else:
                             # Show buffering status

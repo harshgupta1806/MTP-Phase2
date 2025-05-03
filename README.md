@@ -77,6 +77,21 @@ sudo apt-get install libedgetpu1-std
 sudo apt-get install python3-pycoral
 ```
 ---
+### 5. Edgetpu Compiler Download on Linux
+```bash
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+
+sudo apt-get update
+
+sudo apt-get install edgetpu-compiler
+```
+
+Usage:
+``` bash
+edgetpu_compiler -s path/to/tflite_model
+```
 
 ### 5. Raspberry Pi Setup
 
@@ -241,28 +256,33 @@ source mtp-env/bin/activate
 python -m Scripts.collect_data
 ```
 
-#### 2. Train the Model
+#### 2. Train and Convert the Model to tflite
 ```bash
 python -m Scripts.train
 ```
 
-#### 3. Evaluate the Model on CPU/CPU + TPU
+#### 3. Compile the tflite model 
+```bash
+edgetpu_compiler -s path/to/model_name.tflite
+```
+
+#### 4. Evaluate the Model on CPU/CPU + TPU
 ```bash
 python -m Scripts.evaluate
 ```
 
-#### 3. Evaluate the Model on Respberry Pi /Respberry Pi + TPU
+#### 5. Evaluate the Model on Respberry Pi /Respberry Pi + TPU
 ```bash
 python -m Scripts.evaluate_rpi
 ```
 
-#### 4. Run Real-Time Inference 
+#### 6. Run Real-Time Inference 
 * Before running script, SET is_live: True. save_frame: False, save_pcd: False and set model path in `./config/lidar.yaml`
 
 ```bash
 python -m Scripts.predict_live.py
 ```
-#### 5. Inference on Video Data
+#### 7. Inference on Video Data
 
 ```bash
 python -m Scripts.evaluate_video.py
