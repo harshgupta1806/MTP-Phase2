@@ -93,7 +93,7 @@ Usage:
 edgetpu_compiler -s path/to/tflite_model
 ```
 
-### 5. Raspberry Pi Setup
+### 6. Raspberry Pi Setup
 
 If deploying on Raspberry Pi:
 ```bash
@@ -104,7 +104,7 @@ Reference-Document: https://aiyprojects.withgoogle.com/maker/
 ```
 ---
 
-### 6. Verify Installation
+### 7. Verify Installation
 
 Run a sample evaluation to test your setup:
 
